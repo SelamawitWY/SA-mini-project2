@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: paypal-deployment
+  labels:
+    app: paypal
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: paypal
+  template:
+    metadata:
+      labels:
+        app: paypal
+    spec:
+      containers:
+      - name: paypal
+        image: zedagem/paypal-image
+        imagePullPolicy: "IfNotPresent"
+        ports:
+        - containerPort: 8080 # port to access the app in the container 
+        env: #setting enviromental variable for the container
+          - name: token
+            valueFrom:
+              secretKeyRef:
+                name: myvault
+                key: SIGN_KEY
+         
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: paypal-service
+spec:
+  selector:
+    app: paypal
+  # type: NodePort # LoadBalancer for or NodePort external service
+  ports:
+    - protocol: TCP
+      port: 9093 # port to access the pod 
+      targetPort: 8080 # must be the same as the containerPort 
+      # nodePort: 30100 ## for external service port

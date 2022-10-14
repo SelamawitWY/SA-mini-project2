@@ -68,6 +68,9 @@ public class OrderService {
         });
     }
 
+    public Order UpdateOrder(Order order) {
+        return orderRepository.save((order));
+    }
     public Order placeOrder(Order order) throws Exception {
 
         if(checkAvailability(order.getItems())){
@@ -83,10 +86,14 @@ public class OrderService {
     }
 
     public Order findById(Integer id){
-        return orderRepository.findById(id).get();
+        System.out.println(id);
+        Order order =  orderRepository.findById(id).get();
+        System.out.println(order);
+        return  order;//orderRepository.findById(id).get();
     }
 
     public String checkout(ClientPaymentRequest request ){
+
         Order order = orderRepository.findById(request.getOrderId()).get();
         final Double[] totalPrice = {0d};
 

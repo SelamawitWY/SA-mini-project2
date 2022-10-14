@@ -22,17 +22,17 @@ public class RequestFilter implements HandlerInterceptor {
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         String secret = request.getHeader("secret-key");
 
-        System.out.println(secret + " ===== " + secret_key);
-
-        Map<String, Object> returnValue = new HashMap<>();
-
-        Enumeration<String> headerNames = request.getHeaderNames();
-        while(headerNames.hasMoreElements())
-        {
-            String headerName = headerNames.nextElement();
-            System.out.println(headerName +"-----"+ request.getHeader(headerName));
-            returnValue.put(headerName, request.getHeader(headerName));
-        }
+//        System.out.println(secret + " ===== " + secret_key);
+//
+//        Map<String, Object> returnValue = new HashMap<>();
+//
+//        Enumeration<String> headerNames = request.getHeaderNames();
+//        while(headerNames.hasMoreElements())
+//        {
+//            String headerName = headerNames.nextElement();
+//            System.out.println(headerName +"-----"+ request.getHeader(headerName));
+//            returnValue.put(headerName, request.getHeader(headerName));
+//        }
 
         return secret.equals(secret_key);
     }

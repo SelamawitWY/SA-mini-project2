@@ -36,7 +36,7 @@ public class OrderController {
 
     @PutMapping("/update")
     public ResponseEntity<Order> update(@RequestBody  Order newOrder) throws Exception {
-        Order order = orderService.placeOrder(newOrder);
+        Order order = orderService.UpdateOrder(newOrder);
         return ResponseEntity.ok().body(order);
     }
 
