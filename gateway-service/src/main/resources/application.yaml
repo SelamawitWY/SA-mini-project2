@@ -30,5 +30,5 @@ spring:
 
 jwt:
   secret: ${SIGN_KEY:TOP-SECRET}
-  validity: 60
+  validity: 24
   authDisabled: true
