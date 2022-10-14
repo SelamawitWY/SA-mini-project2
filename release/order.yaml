@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: order-service
+spec:
+  selector:
+    matchLabels:
+      app: order-service
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: order-service
+    spec:
+      containers:
+        - name: order-service
+          image: syilma/order-service:v1
+          ports:
+            - containerPort: 8080
+          env: # Setting Environmental Variables
+            - name: DB_HOST # Setting Database host address
+              value: orderdb
+            - name: DB_NAME # Setting Database name
+              value: order
+            - name: DB_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: myvault
+                  key: DB_USER_NAME
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: myvault
+                  key: DB_PASSWORD
+            - name: SIGN_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: myvault
+                  key: SIGN_KEY
+            - name: STOCK_SIZE
+              valueFrom: 
+                configMapKeyRef:
+                  name: stockconfig
+                  key: stocksize
+                 
+            
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: order-service
+spec:
+  ports:
+    - protocol: "TCP"
+      port: 9097 # port to access the pod
+      targetPort: 8080 # must be the same as the containerPort
+      nodePort: 30900 ## for external service port
+  selector:
+    app: order-service
+  type: NodePort

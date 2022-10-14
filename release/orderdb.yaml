@@ -1,0 +1,52 @@
+# Define a 'Service' To Expose MySQL to Other Services
+apiVersion: v1
+kind: Service
+metadata:
+  name: orderdb
+  labels:
+    app: orderdb
+    tier: database
+spec:
+  ports:
+    - port: 3307
+      targetPort: 3307
+  selector:
+    app: orderdb
+    tier: database
+  clusterIP: None # DNS is used, so clusterIP is not needed
+
+---
+# Deployment specification begins here
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: orderdb
+  labels:
+    app: orderdb
+    tier: database
+spec:
+  selector: # mySQL Pod Should contain same labels
+    matchLabels:
+      app: orderdb
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        sidecar.istio.io/inject: "false"
+      labels: # Must match 'Service' and 'Deployment' selectors
+        app: orderdb
+        tier: database
+    spec:
+      containers:
+        - name: orderdb
+          image: mysql
+          imagePullPolicy: "IfNotPresent"
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              value: root
+            - name: MYSQL_DATABASE
+              value: order
+          ports:
+            - containerPort: 3307
+              name: orderdb

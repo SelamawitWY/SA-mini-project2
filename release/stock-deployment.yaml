@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: springboot-stock-deployment
+spec:
+  selector:
+    matchLabels:
+      app: stock-service
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: stock-service
+    spec:
+      containers:
+        - name: stock-service
+          image: zedagem/stockservice-image
+#          /stock-servicelatestupdate
+          ports:
+            - containerPort: 8181
+          env:
+            - name: token
+              valueFrom:
+                secretKeyRef:
+                  name: myvault
+                  key: SIGN_KEY
+       
+---
+
+apiVersion: v1 # Kubernetes API version
+kind: Service # Kubernetes' resource kind we are creating
+metadata: # Metadata of the resource kind we are creating
+  name: stock-service
+spec:
+  type: NodePort # type of the service.
+  selector:
+    app: stock-service
+  ports:
+    - protocol: "TCP"
+      port: 8181 # The port that the service is running on in the cluster and accessible and can be 8081
+      targetPort: 8181 # The port exposed by the service
+      nodePort: 30400
+

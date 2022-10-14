@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: stock-service
+spec:
+  selector:
+    matchLabels:
+      app: stock-service
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: stock-service
+    spec:
+      containers:
+        - name: stock-service
+          image: syilma/stock-service:v1
+          ports:
+            - containerPort: 9000
+          env: # Setting Environmental Variables
+            - name: SIGN_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: myvault
+                  key: SIGN_KEY
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: stock-service
+spec:
+  ports:
+    - protocol: "TCP"
+      port: 9000 # port to access the pod
+      targetPort: 9000 # must be the same as the containerPort
+      nodePort: 30300 ## for external service port
+  selector:
+    app: stock-service
+  type: NodePort

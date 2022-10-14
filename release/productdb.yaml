@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: productdb-deployment
+  labels:
+    app: productdb
+spec:
+  strategy:
+      type: Recreate
+  selector:
+    matchLabels:
+      app: productdb
+  template:
+    metadata:
+      labels:
+        app: productdb
+    spec:
+      containers:
+      - name: productdb
+        image: mysql
+        ports:
+        - containerPort: 3306 # port to access the app in the container 
+        env:
+          - name: MYSQL_ROOT_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: myvault
+                key: DB_PASSWORD
+          - name: MYSQL_DATABASE
+            value: product   
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: productdb-service
+spec:
+  selector:
+    app: productdb
+  ports:
+    - protocol: TCP
+      port: 3306 # port to access the pod 
+      targetPort: 3306 # must be the same as the containerPort 
+  clusterIP: None

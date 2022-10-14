@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: account-service
+spec:
+  selector:
+    matchLabels:
+      app: account-service
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: account-service
+    spec:
+      containers:
+        - name: account-service
+          image: syilma/account-service:v1
+          ports:
+            - containerPort: 8081
+          env: # Setting Environmental Variables
+            - name: DB_HOST # Setting Database host address
+              value: accountdb
+            - name: DB_NAME # Setting Database name
+              value: account
+            - name: DB_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: myvault
+                  key: DB_USER_NAME
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: myvault
+                  key: DB_PASSWORD
+            - name: SIGN_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: myvault
+                  key: SIGN_KEY
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: account-service
+spec:
+  ports:
+    - protocol: "TCP"
+      nodePort: 30200
+      port: 8081 # Port inside the cluster
+      targetPort: 8081 # Port exposed to the outside
+  selector:
+    app: account-service
+  type: NodePort

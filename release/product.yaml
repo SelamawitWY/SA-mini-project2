@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: product-deployment
+  labels:
+    app: product
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: product
+  template:
+    metadata:
+      labels:
+        app: product
+    spec:
+      containers:
+        - name: product
+          image: zedagem/product-image
+          imagePullPolicy: "IfNotPresent"
+          ports:
+            - containerPort: 8080 # port to access the app in the container
+          env: #setting enviromental variable for the container
+            - name: DB_HOST
+              value: productdb-service
+            - name: DB_NAME
+              value: product
+            - name: DB_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: myvault
+                  key: DB_USER_NAME
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: myvault
+                  key: DB_PASSWORD
+            - name: token
+              valueFrom:
+                secretKeyRef:
+                  name: myvault
+                  key: SIGN_KEY
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: product-service
+spec:
+  selector:
+    app: product
+  type: NodePort # LoadBalancer for or NodePort external service
+  ports:
+    - protocol: TCP
+      port: 9091 # port to access the pod
+      targetPort: 8080 # must be the same as the containerPort
+      nodePort: 30100 ## for external service port
