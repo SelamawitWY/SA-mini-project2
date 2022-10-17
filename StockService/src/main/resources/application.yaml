@@ -12,4 +12,9 @@ spring:
       bootstrap-servers: kafka-service-headless:9092
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.apache.kafka.common.serialization.StringSerializer
+#management:
+#  endpoints:
+#    web:
+#      exposure:
+#        include: "*"
 
