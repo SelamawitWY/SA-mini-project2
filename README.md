@@ -1,4 +1,4 @@
-Name of members
+## Name of members
 
 - Esmelealem Mihretu: 614695
 - Selamawit Wodeyohannes: 614647
@@ -8,15 +8,15 @@ Name of members
 
 - Make sure you have docker setup on your machine
 - Make sure you have kubernetes setup on your machine
-- Make sure you install helm
+- Make sure you install helm and kafka
 
   > > brew install helm
   > > helm repo add bitnami https://charts.bitnami.com/bitnami
   > > helm install my-release bitnami/kafka
 
-- Deploy services by running the following command
+- Deploy services by running the following command in the release folder
 
-  > > kubectl apply -f ./
+  > > kubectl apply -f .
 
 - Create account and login
 
@@ -27,6 +27,8 @@ Name of members
   Add the generated token to test the rest APIs
 
 - Demo Video Link:
-  https://drive.google.com/file/d/13LMHirFOSg6FpQAV-virQTRTsyfGUxZ1/view
+  https://drive.google.com/file/d/1gxqm_2-2jAUlqc04iejbNOVXNKk2bIAu/view?usp=sharing
 
 ## NOTE: Postman request collections is attached
+
+https://www.getpostman.com/collections/36a1e6772a09811dc6d3
