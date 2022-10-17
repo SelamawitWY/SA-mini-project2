@@ -10,9 +10,10 @@ import lombok.Setter;
 public class AuthenticationStatus {
     private Boolean isAuthenticated;
     private String message;
-    private Integer accountId;
+//    private Integer accountId;
+    private String jwt;
 
-    public Integer getAccountId() {
-        return accountId;
-    }
+//    public Integer getAccountId() {
+//        return accountId;
+//    }
 }

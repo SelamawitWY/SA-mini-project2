@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: paypal
-        image: zedagem/paypal-image
+        image: syilma/paypal-service:v2
         imagePullPolicy: "IfNotPresent"
         ports:
         - containerPort: 8080 # port to access the app in the container 
@@ -26,7 +26,11 @@ spec:
               secretKeyRef:
                 name: myvault
                 key: SIGN_KEY
-         
+          - name: MY_SERVICE_KEY
+            valueFrom:
+                secretKeyRef:
+                  name: myvault
+                  key: PAYPAL_SERVICE_KEY
 
 ---
 apiVersion: v1

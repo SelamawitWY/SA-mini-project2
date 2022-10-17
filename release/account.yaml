@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: account-service
-          image: syilma/account-service:v1
+          image: syilma/account-service:v2
           ports:
             - containerPort: 8081
           env: # Setting Environmental Variables
@@ -37,6 +37,11 @@ spec:
                 secretKeyRef:
                   name: myvault
                   key: SIGN_KEY
+            - name: MY_SERVICE_KEY 
+              valueFrom:
+                secretKeyRef:
+                  name: myvault
+                  key: ACCOUNT_SERVICE_KEY
 
 ---
 apiVersion: v1

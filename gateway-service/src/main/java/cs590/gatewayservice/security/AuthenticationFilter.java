@@ -73,8 +73,13 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
             }
 
             ServerHttpRequest request = exchange.getRequest().mutate()
-                    .header("secret-key", jwtConfig.getSecret())
-                    .header("account-id", jwtTokenUtil.getUserName(authHeader))
+
+                    .header("jwt", jwtTokenUtil.getToken(authHeader))
+//                    .header("secret-key", jwtConfig.getSecret())
+//                    .header("account-id", jwtTokenUtil.getUserName(authHeader))
+//                    .header("account_service_key", jwtConfig.getAccountServiceKey())
+//                    .header("product_service_key", jwtConfig.getProductServiceKey())
+//                    .header("order_service_key", jwtConfig.getOrderServiceKey())
                     .build();
 
 

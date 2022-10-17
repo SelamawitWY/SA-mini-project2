@@ -41,17 +41,21 @@ public class JwtAuthenticationController {
     }
     @RequestMapping(value = "/authenticate", method = RequestMethod.POST)
     public ResponseEntity<?> createAuthenticationToken(@RequestBody JwtRequest authenticationRequest) {
+        System.out.println(authenticationRequest);
         AuthenticationStatus status = authenticate(authenticationRequest) ;
 
         if (!status.getIsAuthenticated()) {
             List<String> details = new ArrayList<>();
             details.add(status.getMessage());
-            ErrorResponseDto error = new ErrorResponseDto(new Date(), HttpStatus.UNAUTHORIZED.value(), "UNAUTHORIZED", details, "uri");
+            ErrorResponseDto error = new ErrorResponseDto(new Date(),
+                    HttpStatus.UNAUTHORIZED.value(),
+                    "UNAUTHORIZED", details, "uri");
+
             return new ResponseEntity<>(error, HttpStatus.UNAUTHORIZED);
         }
 
-        final String token = jwtTokenUtil.generateToken(status.getAccountId().toString());
-        return ResponseEntity.ok(new JwtResponse(token));
+//        final String token = jwtTokenUtil.generateToken(status.getAccountId().toString());
+        return ResponseEntity.ok(new JwtResponse(status.getJwt()));
     }
 
     private AuthenticationStatus authenticate(JwtRequest authenticationRequest) {//String username, String password) {
@@ -62,13 +66,16 @@ public class JwtAuthenticationController {
         HttpEntity<JwtRequest> request =
                 new HttpEntity<JwtRequest>(authenticationRequest, headers);
 
+
         //account-service:8081
         AuthResponseDto response = restTemplate.postForObject("http://account-service:8081/accounts/authenticate", request, AuthResponseDto.class);
-
-        if (response.getStatus()) {
-            return new AuthenticationStatus(false, "Invalid Username/Password", null);
+        System.out.println(response);
+        if (response == null) {
+            return new AuthenticationStatus(false, "Missing Authorization Header", null    );
+        } else if (response.getStatus()) {
+            return new AuthenticationStatus(false, "Invalid Username/Password", null    );
         }
 
-        return new AuthenticationStatus(true, "Authentication Successful", response.getAccountId());
+        return new AuthenticationStatus(true, "Authentication Successful", response.getJwt());
     }
 }

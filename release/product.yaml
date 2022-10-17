@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: product
-          image: zedagem/product-image
+          image: syilma/product-service:v2
           imagePullPolicy: "IfNotPresent"
           ports:
             - containerPort: 8080 # port to access the app in the container
@@ -40,6 +40,11 @@ spec:
                 secretKeyRef:
                   name: myvault
                   key: SIGN_KEY
+            - name: MY_SERVICE_KEY   # Setting Secret key
+              valueFrom:
+                secretKeyRef:
+                  name: myvault
+                  key: PRODUCT_SERVICE_KEY
 
 ---
 apiVersion: v1

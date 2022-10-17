@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: stock-service
-          image: zedagem/stockservice-image
+          image: syilma/stock-service:v2
 #          /stock-servicelatestupdate
           ports:
             - containerPort: 8181
@@ -24,6 +24,11 @@ spec:
                 secretKeyRef:
                   name: myvault
                   key: SIGN_KEY
+            - name: MY_SERVICE_KEY   # Setting Secret key
+              valueFrom:
+                secretKeyRef:
+                  name: myvault
+                  key: STOCK_SERVICE_KEY
        
 ---
 

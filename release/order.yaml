@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: order-service
-          image: syilma/order-service:v1
+          image: syilma/order-service:v2
           ports:
             - containerPort: 8080
           env: # Setting Environmental Variables
@@ -37,12 +37,32 @@ spec:
                 secretKeyRef:
                   name: myvault
                   key: SIGN_KEY
+            - name: MY_SERVICE_KEY   # Setting Secret key
+              valueFrom:
+                secretKeyRef:
+                  name: myvault
+                  key: ORDER_SERVICE_KEY
+            - name: PRODUCT_SERVICE_KEY   # Setting Secret key
+              valueFrom:
+                secretKeyRef:
+                  name: myvault
+                  key: PRODUCT_SERVICE_KEY
+            - name: STOCK_SERVICE_KEY   # Setting Secret key
+              valueFrom:
+                secretKeyRef:
+                  name: myvault
+                  key: STOCK_SERVICE_KEY
+            - name: PAYMENT_SERVICE_KEY   # Setting Secret key
+              valueFrom:
+                secretKeyRef:
+                  name: myvault
+                  key: PAYMENT_SERVICE_KEY
             - name: STOCK_SIZE
               valueFrom: 
                 configMapKeyRef:
                   name: stockconfig
                   key: stocksize
-                 
+            
             
 ---
 apiVersion: v1

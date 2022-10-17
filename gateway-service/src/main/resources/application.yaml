@@ -15,6 +15,7 @@ spring:
 
         - id: account-service
           uri: http://account-service:8081/
+#          uri: http://localhost:30200/
           predicates:
           - Path=/accounts/**
           filters:
@@ -27,8 +28,7 @@ spring:
           filters:
             - AuthenticationFilter
 
-
 jwt:
-  secret: ${SIGN_KEY:TOP-SECRET}
-  validity: 24
+  secret: ${SIGN_KEY:WRONG-SECRET}
+  validity: 60
   authDisabled: true

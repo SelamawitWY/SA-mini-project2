@@ -46,9 +46,4 @@ public class OrderController {
        return ResponseEntity.ok().body(response);
     }
 
-    @GetMapping("/stockTest")
-    public String checkout(){
-        orderService.checkStock("message");
-        return "sent";
-    }
 }

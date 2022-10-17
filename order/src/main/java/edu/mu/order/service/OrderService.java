@@ -1,21 +1,27 @@
 package edu.mu.order.service;
 
+import edu.mu.order.DTO.AppConstants;
 import edu.mu.order.DTO.ClientPaymentRequest;
 import edu.mu.order.DTO.PaymentRequest;
 import edu.mu.order.DTO.ProductDto;
 import edu.mu.order.entity.Order;
 import edu.mu.order.entity.OrderItem;
 import edu.mu.order.repository.OrderRepository;
+import edu.mu.order.security.JwtUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -26,6 +32,9 @@ public class OrderService {
     private int stockSize;
 
     @Autowired
+    private JwtUtil jwtUtil;
+
+    @Autowired
     private OrderRepository orderRepository;
 
     @Autowired
@@ -34,20 +43,23 @@ public class OrderService {
     @Autowired
     private HttpServletRequest httpServletRequest;
 
+    @Autowired
+    private KafkaTemplate<String, String> kafkaTemplate;
+
+    private static final Logger logger =
+            LoggerFactory.getLogger(OrderService.class);
+
     private boolean checkAvailability(List<OrderItem> items){
        AtomicReference<Boolean> isAllProductAvail = new AtomicReference<>(true);
 
        items.stream().forEach(item -> {
             ProductDto product = restTemplate.getForObject("http://product-service:9091/products/getById/" + item.getProductId(), ProductDto.class);
-            boolean isProdAvail = item.getQuantity() < product.getAvailableUnit();
-            int availableUnit = product.getAvailableUnit();
-            isAllProductAvail.set(isAllProductAvail.get() && isProdAvail);
-
-            if(product.getAvailableUnit() < stockSize) {
-                //call stock service here
-
-
-                System.out.println("Product id "+ item.getProductId() + " is running out of stock, current = " +  availableUnit);
+            if(product == null) {
+                isAllProductAvail.set(false);
+            }
+            else {
+                boolean isProdAvail = item.getQuantity() < product.getAvailableUnit();
+                isAllProductAvail.set(isAllProductAvail.get() && isProdAvail);
             }
         });
 
@@ -61,6 +73,7 @@ public class OrderService {
 
             if(newQuantity < stockSize) {
                 String message = "Product id "+ item.getProductId() + " is running out of stock, current = " +  newQuantity;
+                sendMessage(message);
                 String response = restTemplate.postForObject("http://stock-service:8181/stock/message", message, String.class);
             }
 
@@ -75,10 +88,11 @@ public class OrderService {
 
         if(checkAvailability(order.getItems())){
              updateProduct(order.getItems());
+             order.setStatus("ordered");
             return orderRepository.save(order);
         }
 
-        throw new Exception("Unavailable products");
+        throw new Exception("Order includes unavailable products");
     }
 
     public List<Order> getAll(){
@@ -94,7 +108,15 @@ public class OrderService {
 
     public String checkout(ClientPaymentRequest request ){
 
-        Order order = orderRepository.findById(request.getOrderId()).get();
+        Optional<Order> optionalOrder = orderRepository.findById(request.getOrderId());
+        Order order = optionalOrder.get();
+
+        if(optionalOrder.isEmpty() ){
+            return "Order doesn't not exist";
+        } else if( !order.getStatus().equals("ordered")){
+            return "Order is already paid or shipped";
+        }
+
         final Double[] totalPrice = {0d};
 
         order.getItems().stream().forEach(item -> {
@@ -102,7 +124,7 @@ public class OrderService {
             totalPrice[0] = totalPrice[0] + (product.getPrice() * item.getQuantity()) ;
         });
 
-        String accountId = httpServletRequest.getHeader("account-id");
+        String accountId = jwtUtil.getUserName(httpServletRequest.getHeader("jwt"));
 
         PaymentRequest paymentRequest = new PaymentRequest(request.getOrderId(), request.getPaymentType(), totalPrice[0], Integer.parseInt(accountId));
         HttpHeaders headers = new HttpHeaders();
@@ -116,10 +138,9 @@ public class OrderService {
         return response.equals("") ?  "ordered" : response ;
     }
 
-    public void checkStock(String message) {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<String> newRequest = new HttpEntity<>(message, headers);
-        String response = restTemplate.postForObject("http://stock-service:9000/kafka/publish?message=hellofromstock", newRequest, String.class);
+    public void sendMessage(String message)
+    {
+        logger.info(String.format("Message sent -> %s", message));
+        this.kafkaTemplate.send(AppConstants.TOPIC_NAME, message);
     }
 }

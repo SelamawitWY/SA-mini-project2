@@ -56,9 +56,14 @@ public class AccountService {
         return false;
     }
 
-    public Account authenticate(String email, String password) {
+    public Boolean authenticate(String email, String password) {
         Account account = accountRepository.findAccountByEmailAndPassword(email, password);
-        return account; //(account != null);
+        return (account != null);
+    }
+
+    public Account getUserByEmail(String email, String password) {
+        Account account = accountRepository.findAccountByEmailAndPassword(email, password);
+        return account;
     }
 
     public PaymentMethod addBankMethod(int accountId, BankPayment newMethod) {

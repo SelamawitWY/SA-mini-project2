@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: shipping
-        image: zedagem/shipping-image
+        image: syilma/shipping-service:v2
         imagePullPolicy: "IfNotPresent"
         ports:
         - containerPort: 8080 # port to access the app in the container 
@@ -26,6 +26,11 @@ spec:
               secretKeyRef:
                 name: myvault
                 key: SIGN_KEY
+          - name: MY_SERVICE_KEY   # Setting Secret key
+            valueFrom:
+                secretKeyRef:
+                  name: myvault
+                  key: SHIPPING_SERVICE_KEY               
          
 
 ---

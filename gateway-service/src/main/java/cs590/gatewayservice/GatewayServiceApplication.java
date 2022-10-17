@@ -43,7 +43,9 @@ public class GatewayServiceApplication {
             interceptors = new ArrayList<ClientHttpRequestInterceptor>();
         }
 
-        interceptors.add(new HttpRequestInterceptor("secret-key", config.getSecret()));
+//        interceptors.add(new HttpRequestInterceptor("account_service_key", config.getAccountServiceKey()));
+//        interceptors.add(new HttpRequestInterceptor("product_service_key", config.getProductServiceKey()));
+//        interceptors.add(new HttpRequestInterceptor("order_service_key", config.getOrderServiceKey()));
         restTemplate.setInterceptors(interceptors);
 
         return restTemplate;

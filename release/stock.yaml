@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: stock-kafka-service
+spec:
+  selector:
+    matchLabels:
+      app: stock-kafka-service
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: stock-kafka-service
+    spec:
+      containers:
+        - name: stock-kafka-service
+          image: syilma/stock-kafka-service:v1
+          ports:
+            - containerPort: 9000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: stock-kafka-service
+spec:
+  ports:
+    - protocol: "TCP"
+      port: 9000 # port to access the pod
+      targetPort: 9000 # must be the same as the containerPort
+  selector:
+    app: stock-kafka-service
+ 

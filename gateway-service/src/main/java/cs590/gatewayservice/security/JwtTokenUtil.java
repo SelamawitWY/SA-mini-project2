@@ -34,10 +34,20 @@ public class JwtTokenUtil {
         return "";
     }
 
+    public String getToken(String header){
+
+        String[] parts = header.split(" ");
+        if (parts.length == 2 && "Bearer".equals(parts[0])) {
+            return parts[1];
+        }
+
+        return "";
+    }
+
     public String generateToken(String id) {
         Claims claims = Jwts.claims().setSubject(id);
         long nowMillis = System.currentTimeMillis();
-        long expMillis = nowMillis + config.getValidity() * 1000 * 60 * 60;
+        long expMillis = nowMillis + config.getValidity() * 1000 * 60;
         Date exp = new Date(expMillis);
 
         return Jwts.builder().setClaims(claims).setIssuedAt(new Date(nowMillis)).setExpiration(exp)

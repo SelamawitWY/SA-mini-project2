@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: payment
-        image: zedagem/payment-image
+        image: syilma/payment-service:v2
         imagePullPolicy: "IfNotPresent"
         ports:
         - containerPort: 8080 # port to access the app in the container 
@@ -41,6 +41,42 @@ spec:
               configMapKeyRef:
                 name: paymentmap
                 key: paypal 
+          - name: MY_SERVICE_KEY   
+            valueFrom:
+                secretKeyRef:
+                  name: myvault
+                  key: PAYMENT_SERVICE_KEY
+          - name: CREDIT_SERVICE_KEY
+            valueFrom:
+                secretKeyRef:
+                  name: myvault
+                  key: CREDIT_SERVICE_KEY
+          - name: PAYPAL_SERVICE_KEY
+            valueFrom:
+                secretKeyRef:
+                  name: myvault
+                  key: PAYPAL_SERVICE_KEY
+          - name: BANK_SERVICE_KEY
+            valueFrom:
+                secretKeyRef:
+                  name: myvault
+                  key: BANK_SERVICE_KEY
+          - name: ORDER_SERVICE_KEY  
+            valueFrom:
+                secretKeyRef:
+                  name: myvault
+                  key: ORDER_SERVICE_KEY
+          - name: ACCOUNT_SERVICE_KEY
+            valueFrom:
+                secretKeyRef:
+                  name: myvault
+                  key: ACCOUNT_SERVICE_KEY
+          - name: SHIPPING_SERVICE_KEY
+            valueFrom:
+                secretKeyRef:
+                  name: myvault
+                  key: SHIPPING_SERVICE_KEY
+          
 
 ---
 apiVersion: v1

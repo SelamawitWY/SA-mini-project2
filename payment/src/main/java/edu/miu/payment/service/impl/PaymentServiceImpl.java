@@ -59,6 +59,10 @@ public class PaymentServiceImpl implements PaymentService {
                 new HttpEntity<PaymentRequest>(paymentRequest, headers);
 
 
+        if(paymentMethod == null){
+            return "Payment type doesn't exist";
+        }
+
         // Dynamically getting the url for the payment services from configMap
         String url = way.get(paymentMethod.getPaymentType().toString());
         System.out.println(url);
@@ -82,7 +86,7 @@ public class PaymentServiceImpl implements PaymentService {
                 order.setStatus("shipped");
                 restTemplate.put("http://order-service:9097/orders/update",new HttpEntity<Order>(order,headers));
                 System.out.println("order set to shipped");
-                return "shipped";
+//                return "shipped";
             }
 
             return response;

@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: gateway-service
-          image: syilma/gateway-service:v1
+          image: syilma/gateway-service:v2
           ports:
             - containerPort: 8089
           env:   # Setting Environmental Variables

@@ -1,5 +1,6 @@
 package cs590.accountservice.security;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
@@ -14,29 +15,40 @@ import java.util.Map;
 
 @Component
 public class RequestFilter implements HandlerInterceptor {
-    private final String secret_key;
+    private final String my_service_key;
 
-    public RequestFilter(@Value("${SECRET_KEY}") String key) {
-        this.secret_key = key;
+    private JwtUtil jwtUtil;
+
+    public RequestFilter(@Value("${SERVICE_KEY}") String key, JwtUtil jwtUtil) {
+        this.my_service_key = key;
+        this.jwtUtil = jwtUtil;
     }
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        String secret = request.getHeader("secret-key");
+        String secret = request.getHeader("account_service_key");
+        String token = request.getHeader("jwt");
 
-//        System.out.println(secret + " ===== " + secret_key);
-//
-//        Map<String, Object> returnValue = new HashMap<>();
-//
-//        Enumeration<String> headerNames = request.getHeaderNames();
-//        while(headerNames.hasMoreElements())
-//        {
-//            String headerName = headerNames.nextElement();
-//            System.out.println(headerName +"-----"+ request.getHeader(headerName));
-//            returnValue.put(headerName, request.getHeader(headerName));
-//        }
+        Enumeration<String> headerNames = request.getHeaderNames();
+        while(headerNames.hasMoreElements())
+        {
+            String headerName = headerNames.nextElement();
+            System.out.println(headerName +"-----"+ request.getHeader(headerName));
+        }
 
-        return secret.equals(secret_key);
+        System.out.println(request.getRequestURI());
+        if(request.getRequestURI().equals("/accounts/authenticate") ||
+                request.getRequestURI().equals("/accounts/create")
+        ) {
+            return true;
+        }
+
+        System.out.println(jwtUtil.validateToken(token) + "==" + token +"====" + secret);
+        Boolean status = jwtUtil.validateToken(token);
+
+        status = secret != null ? status || secret.trim().equals(my_service_key.trim()) : status;
+
+        return status; //jwtUtil.validateToken(token) && secret.equals(my_service_key);
     }
 
 

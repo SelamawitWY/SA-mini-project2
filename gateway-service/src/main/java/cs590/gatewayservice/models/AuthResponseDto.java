@@ -9,5 +9,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class AuthResponseDto {
     private Boolean Status;
+    private String  jwt;
     private Integer accountId;
 }
