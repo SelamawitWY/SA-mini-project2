@@ -31,4 +31,5 @@
 
 ## NOTE: Postman request collections is attached
 
+Import the collection into your postman via this link
 https://www.getpostman.com/collections/36a1e6772a09811dc6d3
